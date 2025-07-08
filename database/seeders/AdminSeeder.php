@@ -1,8 +1,9 @@
 <?php
 
-// database/seeders/AdminSeeder.php
+namespace Database\Seeders;
 
 use App\Models\User;
+use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
@@ -20,7 +21,7 @@ class AdminSeeder extends Seeder
     $role = Role::firstOrCreate(['name' => 'admin']);
 
     // Tambahkan permissions global
-    $permissions = ['manage users', 'manage posts', 'view dashboard'];
+    $permissions = ['manage users', 'view dashboard'];
 
     foreach ($permissions as $perm) {
       $p = Permission::firstOrCreate(['name' => $perm]);
