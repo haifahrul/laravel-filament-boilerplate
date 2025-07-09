@@ -25,6 +25,11 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\OrderExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Exports\OrderItemExport;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Columns\IconColumn;
 
 class OrderResource extends Resource
 {
@@ -68,19 +73,20 @@ class OrderResource extends Resource
                             ->required()
                             ->reactive()
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                if (!$state) {
-                                    // Reset jika product_id dihapus
-                                    $set('price', 0);
-                                    $set('subtotal', 0);
-                                    return;
-                                }
+                                $items = $get('../../items'); // semua item dari repeater
+                                $index = $get('__index');     // index saat ini
+                                $qty   = $items[$index]['quantity'] ?? 1;
 
                                 $product = Product::find($state);
                                 if ($product) {
                                     $set('price', $product->price);
-                                    $qty = $get('quantity') ?: 1;
-                                    $set('subtotal', $qty * $product->price);
+                                    $set('subtotal', $product->price * $qty);
                                 }
+
+                                // Hitung ulang total
+                                $newItems = $get('../../items');
+                                $total    = collect($newItems)->sum('subtotal');
+                                $set('../../total_amount', $total);
                             }),
 
                         TextInput::make('quantity')
@@ -89,8 +95,12 @@ class OrderResource extends Resource
                             ->required()
                             ->reactive()
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                $price = $get('price') ?: 0;
+                                $price = $get('price') ?? 0;
                                 $set('subtotal', $state * $price);
+
+                                $items = $get('../../items');
+                                $total = collect($items)->sum(fn ($item) => ($item['price'] ?? 0) * ($item['quantity'] ?? 1));
+                                $set('../../total_amount', $total);
                             }),
 
                         TextInput::make('price')
@@ -99,19 +109,27 @@ class OrderResource extends Resource
                             ->required()
                             ->reactive()
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                $qty = $get('quantity') ?: 1;
+                                $qty = $get('quantity') ?? 1;
                                 $set('subtotal', $state * $qty);
+
+                                $items = $get('../../items');
+                                $total = collect($items)->sum(fn ($item) => ($item['price'] ?? 0) * ($item['quantity'] ?? 1));
+                                $set('../../total_amount', $total);
                             }),
 
                         TextInput::make('subtotal')
                             ->numeric()
                             ->readOnly()
-                            ->dehydrated(false)
                             ->default(0),
                     ])
                     ->createItemButtonLabel('Tambah Produk')
                     ->defaultItems(1)
-                    ->columns(4),
+                    ->columns(4)
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        $total = collect($state)->sum('subtotal');
+                        $set('total_amount', $total);
+                    }),
 
                 TextInput::make('total_amount')
                     ->label('Total')
@@ -131,10 +149,39 @@ class OrderResource extends Resource
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('order_number')
+                    ->label('No. Order')
+                    ->sortable()
+                    ->searchable(),
+
+                TextColumn::make('order_date')
+                    ->label('Tanggal')
+                    ->date()
+                    ->sortable(),
+
+                TextColumn::make('user.name')
+                    ->label('Sales')
+                    ->sortable()
+                    ->searchable(),
+
+                TextColumn::make('customer.name')
+                    ->label('Customer')
+                    ->sortable()
+                    ->searchable(),
+
+                TextColumn::make('total_amount')
+                    ->label('Total')
+                    ->money('IDR', locale: 'id')
+                    ->sortable(),
             ])
             ->filters([
-                //
+                SelectFilter::make('user_id')
+                    ->label('Filter Sales')
+                    ->relationship('user', 'name'),
+
+                SelectFilter::make('customer_id')
+                    ->label('Filter Customer')
+                    ->relationship('customer', 'name'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
