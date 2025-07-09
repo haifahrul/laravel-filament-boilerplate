@@ -31,10 +31,10 @@ class UserResource extends Resource
     protected static ?string $navigationGroup = 'User Management';
     protected static ?int $navigationSort = 1;
 
-    public static function shouldRegisterNavigation(): bool
-    {
-        return auth()->user()?->can('users.view');
-    }
+    // public static function shouldRegisterNavigation(): bool
+    // {
+    //     return auth()->user()?->can('users.view');
+    // }
 
     public static function form(Form $form): Form
     {

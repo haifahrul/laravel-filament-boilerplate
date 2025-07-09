@@ -17,6 +17,10 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Actions\Action;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\VisitExport;
+use Filament\Forms\Components\DatePicker;
 
 class VisitResource extends Resource
 {
@@ -60,7 +64,20 @@ class VisitResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->headerActions([
+                Action::make('Export Kunjungan (Excel)')
+                    ->form([
+                        DatePicker::make('from')->label('Dari Tanggal'),
+                        DatePicker::make('to')->label('Sampai Tanggal'),
+                    ])
+                    ->action(function (array $data) {
+                        $filename = 'laporan-kunjungan-' . now()->format('Ymd_His') . '.xlsx';
+                        return Excel::download(new VisitExport($data['from'], $data['to']), $filename);
+                    })
+                    ->color('success'),
+            ])
+        ;
     }
 
     public static function getRelations(): array

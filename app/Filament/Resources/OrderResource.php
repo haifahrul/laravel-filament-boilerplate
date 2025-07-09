@@ -6,6 +6,7 @@ use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\DatePicker;
@@ -23,6 +24,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\OrderExport;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Exports\OrderItemExport;
 
 class OrderResource extends Resource
 {
@@ -37,10 +39,19 @@ class OrderResource extends Resource
                 TextInput::make('order_number')->required()->unique(ignoreRecord: true),
                 DatePicker::make('order_date')->required(),
                 Select::make('user_id')
-                    ->relationship('user', 'name')
                     ->label('Sales')
+                    ->options(User::role('sales')->pluck('name', 'id'))
                     ->searchable()
                     ->required(),
+                // Select::make('user_id')
+                //     ->relationship(
+                //         name: 'user',
+                //         titleAttribute: 'name',
+                //         modifyQueryUsing: fn ($query) => $query->role('sales')
+                //     )
+                //     ->label('Sales')
+                //     ->searchable()
+                //     ->required(),
                 Select::make('customer_id')
                     ->relationship('customer', 'name')
                     ->searchable()
@@ -154,6 +165,16 @@ class OrderResource extends Resource
                         $orders = (new OrderExport($data['from'], $data['to']))->collection();
                         $pdf    = Pdf::loadView('exports.orders', ['orders' => $orders]);
                         return response()->streamDownload(fn () => print ($pdf->stream()), 'laporan-order.pdf');
+                    })
+                    ->color('gray'),
+                Action::make('Export Detail Order (Excel)')
+                    ->form([
+                        DatePicker::make('from')->label('Dari Tanggal'),
+                        DatePicker::make('to')->label('Sampai Tanggal'),
+                    ])
+                    ->action(function (array $data) {
+                        $filename = 'laporan-order-items-' . now()->format('Ymd_His') . '.xlsx';
+                        return Excel::download(new OrderItemExport($data['from'], $data['to']), $filename);
                     })
                     ->color('gray'),
             ]);

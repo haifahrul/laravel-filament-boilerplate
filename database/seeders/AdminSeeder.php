@@ -11,23 +11,28 @@ class AdminSeeder extends Seeder
 {
   public function run()
   {
-    $admin = User::updateOrCreate([
+    // Buat user admin (opsional)
+    $user = User::updateOrCreate([
       'email' => 'admin@example.com',
     ], [
-      'name'     => 'Super Admin',
+      'name'     => 'Admin',
       'password' => bcrypt('password'),
     ]);
 
+    // Buat role admin
     $role = Role::firstOrCreate(['name' => 'admin']);
 
-    // Tambahkan permissions global
-    $permissions = ['manage users', 'view dashboard'];
+    // Hanya permission selain user management
+    $permissions = Permission::all()->filter(function ($permission) {
+      return !preg_match('/^(users|roles|permissions)\./', $permission->name);
+    });
 
-    foreach ($permissions as $perm) {
-      $p = Permission::firstOrCreate(['name' => $perm]);
-      $role->givePermissionTo($p);
-    }
+    // Assign permission ke role admin
+    $role->syncPermissions($permissions);
 
-    $admin->assignRole($role);
+    // Assign role ke user
+    $user->assignRole($role);
+
+    $this->command->info("✅ Admin user created with limited permissions.");
   }
 }
