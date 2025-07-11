@@ -28,10 +28,15 @@ class ProductResource extends Resource
     {
         return $form->schema([
             TextInput::make('name')->required(),
-            TextInput::make('sku')->required()->unique(),
+            TextInput::make('sku')
+                ->required()
+                ->rule(fn ($record) => \Illuminate\Validation\Rule::unique('products', 'sku')->ignore($record)),
             Textarea::make('description'),
             TextInput::make('price')->numeric()->required(),
-            FileUpload::make('image_path')->directory('products')->image(),
+            FileUpload::make('image_path')
+                ->directory('products')
+                ->image()
+                ->label('Image'),
         ]);
     }
 
@@ -41,7 +46,9 @@ class ProductResource extends Resource
             TextColumn::make('name')->searchable(),
             TextColumn::make('sku'),
             TextColumn::make('price')->money('IDR'),
-            ImageColumn::make('image_path')->square(),
+            ImageColumn::make('image_path')
+                ->square()
+                ->label('Image'),
         ]);
     }
 

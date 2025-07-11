@@ -25,14 +25,6 @@ use Filament\Navigation\NavigationBuilder;
 
 class AdminPanelProvider extends PanelProvider
 {
-    // public function boot()
-    // {
-    //     Filament::serving(function () {
-    //         if (auth()->check() && !auth()->user()->hasRole('super_admin')) {
-    //             abort(403, 'Unauthorized');
-    //         }
-    //     });
-    // }
 
     public function panel(Panel $panel): Panel
     {
