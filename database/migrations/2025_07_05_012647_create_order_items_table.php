@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->decimal('price', 12, 2); // snapshot harga
             $table->decimal('subtotal', 12, 2); // qty * price
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

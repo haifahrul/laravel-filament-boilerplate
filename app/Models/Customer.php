@@ -26,4 +26,9 @@ class Customer extends Model
     {
         return $this->hasMany(Order::class);
     }
+
+    public function latestVisit()
+    {
+        return $this->hasOne(\App\Models\Visit::class)->latest('checked_in_at');
+    }
 }

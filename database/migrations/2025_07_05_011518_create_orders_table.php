@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->decimal('total_amount', 12, 2);
             $table->text('notes')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

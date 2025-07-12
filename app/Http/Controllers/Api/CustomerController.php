@@ -3,65 +3,133 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Customer;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
-use App\Models\User;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class CustomerController extends Controller
 {
     use ApiResponse;
 
-    public function register(Request $request)
+    public function index(Request $request)
     {
-        $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
+        try {
+            $user = $request->user();
 
-        $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+            $limit = (int) $request->input('limit', 10);
+            $query = Customer::query()
+                ->where('user_id', $user->id)
+                ->when(
+                    $request->search,
+                    fn ($q) =>
+                    $q->where('name', 'like', '%' . $request->search . '%')
+                )
+                ->with(['latestVisit' => fn ($q) => $q->latest('checked_in_at')]);
 
-        return $this->success([
-            'token' => $user->createToken('mobile')->plainTextToken,
-            'user'  => $user,
-        ], 'User registered successfully', 201);
-    }
+            $paginator = $query->paginate($limit);
 
-    public function login(Request $request)
-    {
-        $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required',
-        ]);
+            $result = self::paginate($paginator, function ($customer) {
+                return [
+                    'id'            => $customer->id,
+                    'name'          => $customer->name,
+                    'address'       => $customer->address,
+                    'contact'       => $customer->contact,
+                    'business_type' => $customer->business_type,
+                    'latitude'      => $customer->latitude,
+                    'longitude'     => $customer->longitude,
+                    'last_visit'    => optional($customer->latestVisit)->checked_in_at,
+                ];
+            });
 
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            // Mengembalikan response error API
-            return $this->error('The provided credentials are incorrect.', 401);
+            return $this->success($result);
+        } catch (\Throwable $th) {
+            return $this->success('Internal Server Error', $th->getCode());
         }
-
-        return $this->success([
-            'token' => $user->createToken('mobile')->plainTextToken,
-            'user'  => $user,
-        ], 'Login successful');
     }
 
-    public function logout(Request $request)
+    public function store(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        try {
+            $validated = $request->validate([
+                'name'          => 'required|string|max:255',
+                'address'       => 'required|string',
+                'contact'       => 'nullable|string|max:20',
+                'business_type' => 'nullable|string|max:50',
+                'latitude'      => 'required|numeric',
+                'longitude'     => 'required|numeric',
+            ]);
 
-        return $this->success(null, 'Logged out successfully');
+            $customer = Customer::create([
+                ...$validated,
+                'user_id' => $request->user()->id,
+            ]);
+
+            return $this->success([
+                'id' => $customer->id,
+            ], 'Customer created successfully.');
+        } catch (\Throwable $th) {
+            return $this->success('Internal Server Error', $th->getCode());
+        }
     }
 
-    public function me(Request $request)
+    public function show($id)
     {
-        return $this->success($request->user(), 'User data retrieved successfully');
+        try {
+            $customer = Customer::with([
+                'latestVisit' => fn ($q) => $q->latest('checked_in_at'),
+            ])
+                ->where('id', $id)
+                ->where('user_id', auth()->id())
+                ->firstOrFail();
+
+            return $this->success([
+                'id'            => $customer->id,
+                'name'          => $customer->name,
+                'address'       => $customer->address,
+                'contact'       => $customer->contact,
+                'business_type' => $customer->business_type,
+                'latitude'      => $customer->latitude,
+                'longitude'     => $customer->longitude,
+                'last_visit'    => optional($customer->latestVisit)->checked_in_at,
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return $this->error('Data tidak ditemukan', 404);
+        }
     }
+
+    public function update(Request $request, $id)
+    {
+        try {
+            $customer = Customer::findOrFail($id);
+
+            $validated = $request->validate([
+                'name'          => 'required|string|max:255',
+                'address'       => 'nullable|string',
+                'contact'       => 'nullable|string|max:20',
+                'business_type' => 'nullable|string|max:50',
+                'latitude'      => 'required|numeric',
+                'longitude'     => 'required|numeric',
+            ]);
+
+            $customer->update($validated);
+
+            return $this->success(null, 'Customer updated successfully.');
+        } catch (\Throwable $th) {
+            return $this->success('Internal Server Error', $th->getCode());
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $customer = Customer::findOrFail($id);
+            $customer->delete();
+
+            return $this->success(null, 'Customer deleted (soft) successfully.');
+        } catch (ModelNotFoundException $e) {
+            return $this->error('Data tidak ditemukan', 404);
+        }
+    }
+
 }

@@ -14,11 +14,11 @@ class Visit extends Model
         'customer_id',
         'activity_type',
         'note',
+        'latitude',
+        'longitude',
         'photo_path',
         'checked_in_at',
         'checked_out_at',
-        'latitude',
-        'longitude',
     ];
 
     public function user()
