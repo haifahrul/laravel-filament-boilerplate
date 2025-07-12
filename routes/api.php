@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ProductController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\VisitController;
@@ -40,6 +41,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', [CustomerController::class, 'store']);    // Create
         Route::put('{id}', [CustomerController::class, 'update']); // Update
         Route::delete('{id}', [CustomerController::class, 'destroy']); // Soft Delete
+    });
+
+    // Products
+    Route::prefix('products')->group(function () {
+        Route::get('/', [ProductController::class, 'index']);
+        // Route::get('{id}', [ProductController::class, 'show']);
     });
 
     // Orders

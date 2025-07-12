@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->text('description')->nullable();
             $table->decimal('price', 12, 2);
             $table->string('image_path')->nullable();
+            $table->tinyInteger('status')->default(1)->comment('1: Active, 2: Non Active');
             $table->timestamps();
         });
     }
