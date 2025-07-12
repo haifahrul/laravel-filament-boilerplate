@@ -35,6 +35,6 @@ trait RedirectsToIndexAfterSave
 
     protected function getSavedNotification(): ?Notification
     {
-        return null;
+        return null;  // 🔕 Matikan notif default (akan diganti di trait)
     }
 }
