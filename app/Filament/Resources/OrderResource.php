@@ -7,6 +7,7 @@ use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
+use App\Traits\HasResourcePermissions;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\DatePicker;
@@ -33,6 +34,7 @@ use Filament\Tables\Columns\IconColumn;
 
 class OrderResource extends Resource
 {
+    use HasResourcePermissions;
     protected static ?string $model = Order::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';

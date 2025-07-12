@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\VisitResource\Pages;
 use App\Models\Visit;
 use App\Services\GeoService;
+use App\Traits\HasResourcePermissions;
 use Dotswan\MapPicker\Fields\Map;
 use Dotswan\MapPicker\Infolists\MapEntry;
 use Filament\Forms\Components\Card;
@@ -33,6 +34,7 @@ use Filament\Forms\Set;
 
 class VisitResource extends Resource
 {
+    use HasResourcePermissions;
     protected static ?string $model = Visit::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';

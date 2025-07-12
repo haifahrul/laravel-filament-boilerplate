@@ -8,34 +8,36 @@ use Spatie\Permission\Models\Role;
 
 class PermissionSeeder extends Seeder
 {
-  public function run()
-  {
-    $resources = [
-      'users',
-      'roles',
-      'permissions',
-      'orders',
-      'visits',
-      'products',
-      // Tambahkan resource lain jika ada
-    ];
+    public function run()
+    {
+        $resources = [
+            'users',
+            'roles',
+            'permissions',
+            'products',
+            'orders',
+            'order_items',
+            'visits',
+            'customers',
+            'activity_logs',
+        ];
 
-    $actions = [
-      'view',
-      'create',
-      'update',
-      'delete',
-      'restore',
-      'force_delete',
-    ];
+        $actions = [
+            'view',
+            'create',
+            'update',
+            'delete',
+            'restore',
+            'force_delete',
+        ];
 
-    foreach ($resources as $resource) {
-      foreach ($actions as $action) {
-        $permissionName = "{$resource}.{$action}";
-        Permission::firstOrCreate(['name' => $permissionName]);
-      }
+        foreach ($resources as $resource) {
+            foreach ($actions as $action) {
+                $permissionName = "{$resource}.{$action}";
+                Permission::firstOrCreate(['name' => $permissionName]);
+            }
+        }
+
+        $this->command->info('✅ Permissions created.');
     }
-
-    $this->command->info('✅ Permissions created.');
-  }
 }

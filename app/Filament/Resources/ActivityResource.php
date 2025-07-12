@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ActivityResource\Pages;
+use App\Traits\HasResourcePermissions;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -12,6 +13,7 @@ use Spatie\Activitylog\Models\Activity;
 
 class ActivityResource extends Resource
 {
+    use HasResourcePermissions;
     protected static ?string $model = Activity::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
