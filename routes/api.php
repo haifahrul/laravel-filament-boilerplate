@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Api\SyncController;
+use App\Http\Controllers\Api\OfflineController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\DashboardController;
@@ -67,6 +67,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Offline Mode
     Route::prefix('offline')->group(function () {
-        Route::post('/sync', [SyncController::class, 'store']);
+        Route::post('/sync', [OfflineController::class, 'store']);
     });
 });

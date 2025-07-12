@@ -13,7 +13,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class SyncController extends Controller
+/**
+ * Summary of OfflineController
+ * Offilne Mode untuk Mobile
+ */
+class OfflineController extends Controller
 {
     use ApiResponse;
 
