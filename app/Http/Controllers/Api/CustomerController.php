@@ -5,12 +5,13 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Traits\ApiResponse;
+use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class CustomerController extends Controller
 {
-    use ApiResponse;
+    use ApiResponse, ValidatesRequests;
 
     public function index(Request $request)
     {
@@ -130,6 +131,44 @@ class CustomerController extends Controller
         } catch (ModelNotFoundException $e) {
             return $this->error('Data tidak ditemukan', 404);
         }
+    }
+
+    public function nearby(Request $request)
+    {
+        $this->validate($request, [
+            'lat'    => 'required|numeric',
+            'lng'    => 'required|numeric',
+            'radius' => 'nullable|numeric',
+        ]);
+
+        $user   = $request->user();
+        $lat    = $request->input('lat');
+        $lng    = $request->input('lng');
+        $radius = $request->input('radius', 5); // default 5km
+
+        $customers = Customer::selectRaw("
+            id, name, address, latitude, longitude,
+            (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?))
+            + sin(radians(?)) * sin(radians(latitude)))) AS distance
+        ", [$lat, $lng, $lat])
+            ->where('user_id', $user->id)
+            ->having('distance', '<=', $radius)
+            ->orderBy('distance')
+            ->limit(20)
+            ->get();
+
+        $result = $customers->map(function ($customer) {
+            return [
+                'id'          => $customer->id,
+                'name'        => $customer->name,
+                'address'     => $customer->address,
+                'latitude'    => $customer->latitude,
+                'longitude'   => $customer->longitude,
+                'distance_km' => round($customer->distance, 2),
+            ];
+        });
+
+        return $this->success($result);
     }
 
 }
