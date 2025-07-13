@@ -16,8 +16,6 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             SuperAdminSeeder::class,
             AdminSeeder::class,
-            SalesUserSeeder::class,
-            DummyDataSeeder::class,
         ]);
 
         // User::factory(10)->create();

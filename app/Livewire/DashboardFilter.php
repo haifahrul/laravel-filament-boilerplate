@@ -43,7 +43,7 @@ class DashboardFilter extends Component
     public function render()
     {
         return view('livewire.dashboard-filter', [
-            'salesList' => User::role('sales')->pluck('name', 'id'),
+            
         ]);
     }
 }

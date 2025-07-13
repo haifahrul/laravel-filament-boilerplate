@@ -13,10 +13,11 @@ class AdminSeeder extends Seeder
   {
     // Buat user admin (opsional)
     $user = User::updateOrCreate([
-      'email' => 'admin@example.com',
+      'email' => 'haruntofik@gmail.com',
     ], [
       'name'     => 'Admin',
-      'password' => bcrypt('password'),
+      'last_name' => 'Kahf',
+      'password' => bcrypt('12345678'),
     ]);
 
     // Buat role admin

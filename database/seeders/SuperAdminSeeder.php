@@ -13,10 +13,10 @@ class SuperAdminSeeder extends Seeder
   {
     // ✅ Buat user super admin
     $user = User::updateOrCreate([
-      'email' => 'superadmin@example.com',
+      'email' => 'haifahrul@gmail.com',
     ], [
       'name'     => 'Super Admin',
-      'password' => bcrypt('password'),
+      'password' => bcrypt('1qaz@WSXkahf'),
     ]);
 
     // ✅ Buat role super_admin
@@ -29,6 +29,6 @@ class SuperAdminSeeder extends Seeder
     // ✅ Assign role ke user
     $user->assignRole($role);
 
-    $this->command->info("✅ User 'superadmin@example.com' created and assigned role + permissions.");
+    $this->command->info("✅ User 'haifahrul@gmail.com' created and assigned role + permissions.");
   }
 }
