@@ -10,15 +10,17 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('news', function (Blueprint $table) {
-            $table->id();
-            $table->text('thumbnail')->nullable();
-            $table->json('title');
-            $table->json('slug')->nullable();
-            $table->json('content')->nullable();
-            $table->boolean('is_published')->default(false);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('ppdbs')) {
+            Schema::create('news', function (Blueprint $table) {
+                $table->id();
+                $table->text('thumbnail')->nullable();
+                $table->json('title');
+                $table->json('slug')->nullable();
+                $table->json('content')->nullable();
+                $table->boolean('is_published')->default(false);
+                $table->timestamps();
+            });
+        }
     }
 
     /**
