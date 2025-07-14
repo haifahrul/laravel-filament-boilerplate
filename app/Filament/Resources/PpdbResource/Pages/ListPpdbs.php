@@ -9,6 +9,7 @@ use Filament\Resources\Pages\ListRecords;
 class ListPpdbs extends ListRecords
 {
     protected static string $resource = PpdbResource::class;
+    protected static ?string $title = 'PPDB';
 
     protected function getHeaderActions(): array
     {

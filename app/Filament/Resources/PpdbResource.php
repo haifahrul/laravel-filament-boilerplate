@@ -20,7 +20,7 @@ use App\Exports\PpdbsExport;
 
 class PpdbResource extends Resource
 {
-    // use HasResourcePermissions;
+    use HasResourcePermissions;
     protected static ?string $model = Ppdb::class;
     protected static ?string $navigationIcon = 'heroicon-o-user-plus';
     protected static ?string $navigationLabel = 'PPDB';

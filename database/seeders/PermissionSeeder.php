@@ -15,7 +15,7 @@ class PermissionSeeder extends Seeder
             'roles',
             'permissions',
             'news',
-            'ppdb',
+            'ppdbs',
         ];
 
         $actions = [
