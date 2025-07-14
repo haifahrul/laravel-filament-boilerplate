@@ -14,12 +14,8 @@ class PermissionSeeder extends Seeder
             'users',
             'roles',
             'permissions',
-            'products',
-            'orders',
-            'order_items',
-            'visits',
-            'customers',
-            'activity_logs',
+            'news',
+            'ppdb',
         ];
 
         $actions = [

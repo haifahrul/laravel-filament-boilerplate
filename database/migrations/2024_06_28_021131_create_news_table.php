@@ -10,7 +10,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        if (!Schema::hasTable('ppdbs')) {
+        if (!Schema::hasTable('news')) {
             Schema::create('news', function (Blueprint $table) {
                 $table->id();
                 $table->text('thumbnail')->nullable();
