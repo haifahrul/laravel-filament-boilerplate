@@ -3,11 +3,13 @@
 namespace App\Filament\Resources\RoleResource\Pages;
 
 use App\Filament\Resources\RoleResource;
+use App\Traits\RedirectsToIndexAfterSave;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
 class EditRole extends EditRecord
 {
+    use RedirectsToIndexAfterSave;
     protected static string $resource = RoleResource::class;
 
     protected function getHeaderActions(): array
@@ -15,10 +17,5 @@ class EditRole extends EditRecord
         return [
             Actions\DeleteAction::make(),
         ];
-    }
-
-    protected function getRedirectUrl(): string
-    {
-        return $this->getResource()::getUrl('index'); // redirect ke tabel user
     }
 }

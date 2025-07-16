@@ -23,8 +23,7 @@
 
             <h1 class="text-3xl font-bold text-blue-700 mb-2">Selamat Datang!</h1>
             <p class="text-gray-600 mb-6">
-                Aplikasi <span class="font-semibold text-blue-600">Sales Canvaser</span> siap membantumu mencatat,
-                melacak, dan mengelola kunjungan penjualan harian.
+                <span class="font-semibold text-blue-600">KAHF</span> International Boarding School.
             </p>
 
             <div class="flex flex-col gap-3">
@@ -38,7 +37,7 @@
             </div>
 
             <div class="mt-6 text-xs text-gray-400">
-                © 2025 Sales Canvaser App Provided by haifahrul@gmail.com
+                © 2025 KAHF App Provided by haifahrul@gmail.com
             </div>
         </div>
     </div>

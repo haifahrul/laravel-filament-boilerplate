@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Filament\Resources\PermissionResource\Pages;
+namespace App\Filament\Resources\NewsResource\Pages;
 
-use App\Filament\Resources\PermissionResource;
+use App\Filament\Resources\NewsResource;
 use App\Traits\RedirectsToIndexAfterSave;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-class EditPermission extends EditRecord
+class EditNews extends EditRecord
 {
     use RedirectsToIndexAfterSave;
-    protected static string $resource = PermissionResource::class;
+    protected static string $resource = NewsResource::class;
 
     protected function getHeaderActions(): array
     {
